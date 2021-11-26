@@ -36,9 +36,13 @@ To check if the angle calculation works you have to run ads.py file
 Before that you will have to set up PWM on the Jetson (https://docs.nvidia.com/jetson/l4t/index.html#page/Tegra%20Linux%20Driver%20Package%20Development%20Guide/hw_setup_jetson_io.html)
 
   sudo /opt/nvidia/jetson-io/jetson-io.py
+  
   Configure 40-pin expansion header
+  
   turn on pwm0 and pwm2 (with space bar)
-  Back 
+  
+  Back
+  
   Save and reboot to reconfigure pins
 
 To check if the motor works you have to run pwm.py file
