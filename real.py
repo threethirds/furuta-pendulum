@@ -71,7 +71,9 @@ class FurutaPendulumEnv(gym.Env):
         # set new velocity every self.steps step
         if self.total_amount_of_steps % self.steps == 0:
             self.pendulum.set_rotation(action)
-            # ???
+
+            # Wait for the gradient steps
+            # TODO implement this properly
             if self.total_amount_of_steps % 1000 == 999:
                 self.pendulum.set_rotation(0)
 

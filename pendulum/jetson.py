@@ -22,9 +22,6 @@ class JetsonPendulum(Pendulum):
         ads = ADS.ADS1015(i2c)
         self.adc = AnalogIn(ads, ADS.P0)
 
-        # ???
-        time.sleep(1)
-
         # PWM
         GPIO.setup(13, GPIO.OUT)
         GPIO.setup(20, GPIO.OUT, initial=1)
@@ -34,6 +31,7 @@ class JetsonPendulum(Pendulum):
         self.quarters = None
         self.value_of_zero = None
         atexit.register(GPIO.cleanup)
+        atexit.register(lambda: self.set_rotation(0))
 
     def set_rotation(self, rate: float):
 
@@ -76,12 +74,6 @@ class JetsonPendulum(Pendulum):
         for i in range(len(self.quarters)):
             self.quarters[i] = self.quarters[i] % 3.33
 
-        angle_of_zero = ((0.85 - self.quarters[0]) / 0.85) / 4
+        angle_of_zero = (0.85 - x) / 0.85
 
-        self.value_of_zero = -0.5
-        if angle_of_zero < 0:
-            self.value_of_zero = -0.5
-        elif angle_of_zero > 1:
-            self.value_of_zero = -0.5
-        elif angle_of_zero < 0.25:
-            self.value_of_zero = -(angle_of_zero * 2 + 0.5)
+        self.value_of_zero = -(angle_of_zero / 2 + 0.5)
