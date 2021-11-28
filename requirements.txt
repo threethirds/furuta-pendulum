@@ -1,7 +1,5 @@
-stable-baselines3==1.2.0
-gym==0.18.3
+Jetson.GPIO
 git+git://github.com/threethirds/Adafruit_Blinka@e54148f#egg=Adafruit_Blinka
 git+git://github.com/threethirds/Adafruit_CircuitPython_ADS1x15@66f66e7#egg=Adafruit_CircuitPython_ADS1x15
-Jetson.GPIO
+git+git://github.com/threethirds/stable-baselines3@4161de8#egg=stable_baselines3
 pyzmq
-tensorboard
