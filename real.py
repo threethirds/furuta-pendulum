@@ -72,30 +72,10 @@ class FurutaPendulumEnv(gym.Env):
         if self.total_amount_of_steps % self.steps == 0:
             self.pendulum.set_rotation(action)
 
+            # Wait for the gradient steps
+            # TODO implement this properly
             if self.total_amount_of_steps % 1500 == 1499:
-                my_pwm.ChangeDutyCycle(0)
-
-            self.step_counter = 0
-        
-        # Calculate the current angle 
-
-        armangle = chan.voltage
-
-
-        if armangle < 0.:
-            armangle = self.value_of_zero
-        elif armangle>3.33:
-            armangle = self.value_of_zero
-        elif armangle < self.quarters[0]:
-            armangle = -(self.value_of_zero+1)*armangle/self.quarters[0] + self.value_of_zero
-        elif armangle<self.quarters[2]:
-            armangle = 1-(armangle-self.quarters[0])/1.7
-        elif armangle<self.quarters[3]:
-            armangle = -(armangle - self.quarters[2])/1.7
-        elif armangle<3.33:
-            armangle = (armangle-self.quarters[3])*(self.value_of_zero+0.5)/(3.33-self.quarters[3]) - 0.5
-        
-        alpha = armangle * np.pi
+                self.pendulum.set_rotation(0)
 
         # get the current angle
         # maybe above velocity ?? (delayed every step steps)
