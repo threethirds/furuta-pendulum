@@ -141,7 +141,7 @@ class FurutaPendulumEnv(gym.Env):
             GPIO.output(20, direction)
             my_pwm.ChangeDutyCycle(adjusted_action)
 
-            if self.total_amount_of_steps % 1000 == 999:
+            if self.total_amount_of_steps % 1500 == 1499:
                 my_pwm.ChangeDutyCycle(0)
 
             self.step_counter = 0

@@ -13,7 +13,7 @@ env.variable_init(steps = 1, coefficient = 0.4, timestep = 240)
 
 env = FrameStack(env, 13)
 
-file_name = "GGGPolicies/10000furutapendulum"
+file_name = "Policies/00004furutapendulum"
 
 model = SAC.load(file_name)
 
@@ -23,7 +23,7 @@ model.set_env(env)
 
 model.learn(total_timesteps=8000)
 
-model.save("SACPolicies/00004furutapendulum.zip")
+model.save("Policies/00005furutapendulum.zip")
 
 env.end()
 
