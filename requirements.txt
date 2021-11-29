@@ -1,5 +1,5 @@
 Jetson.GPIO
 git+git://github.com/threethirds/Adafruit_Blinka@e54148f#egg=Adafruit_Blinka
 git+git://github.com/threethirds/Adafruit_CircuitPython_ADS1x15@66f66e7#egg=Adafruit_CircuitPython_ADS1x15
-git+git://github.com/threethirds/stable-baselines3@4161de8#egg=stable_baselines3
+git+git://github.com/threethirds/stable-baselines3@234c289#egg=stable_baselines3
 pyzmq
