@@ -30,7 +30,7 @@ class FurutaPendulumEnv(gym.Env):
         The reward is ((1-(|Second Arm Angle|/π))-0.5)/0.5 each step, the interval is [-0.1, 0.1]
     """
 
-    def __init__(self, pendulum: Pendulum, steps=4, timestep=240):
+    def __init__(self, pendulum: Pendulum, steps=4, timestep=120):
 
         self.pendulum = pendulum
         self.steps = steps
