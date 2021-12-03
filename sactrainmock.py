@@ -11,7 +11,7 @@ pendulum = MockPendulum()
 env = FurutaPendulumEnv(pendulum, steps=1, timestep=240)
 env = FrameStack(env, 13)
 
-model = SAC('MlpPolicy', env, verbose=1, gamma=0.95, gradient_steps=100, train_freq=1500, device='cpu')
+model = SAC('MlpPolicy', env, verbose=1, gamma=0.95, gradient_steps=100, train_freq=1500, device='cuda')
 model.set_env(env)
 
 

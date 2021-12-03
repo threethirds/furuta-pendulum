@@ -1,3 +1,4 @@
+import threading
 import atexit
 import math
 import time
@@ -33,6 +34,9 @@ class JetsonPendulum(Pendulum):
         atexit.register(GPIO.cleanup)
         atexit.register(lambda: self.set_rotation(0))
 
+        self.last_set_rotation = time.time()
+        threading.Timer(1, self.stop_if_inactive).start()
+
     def set_rotation(self, rate: float):
 
         assert -1 <= rate <= 1
@@ -42,6 +46,8 @@ class JetsonPendulum(Pendulum):
 
         GPIO.output(20, direction)
         self.pwm.ChangeDutyCycle(duty_cycle)
+
+        self.last_set_rotation = time.time()
 
     def angle(self) -> float:
 
@@ -77,3 +83,9 @@ class JetsonPendulum(Pendulum):
         angle_of_zero = (0.85 - x) / 0.85
 
         self.value_of_zero = -(angle_of_zero / 2 + 0.5)
+
+    def stop_if_inactive(self):
+
+        if time.time() - self.last_set_rotation > 1:
+            self.set_rotation(0)
+
