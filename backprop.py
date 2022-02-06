@@ -14,7 +14,7 @@ from gym.wrappers import FrameStack
 from stable_baselines3.common.utils import polyak_update
 from stable_baselines3 import SAC
 
-from rollout_backprop_definitions import get_datetime, get_current_episode, setup_rollout_sac, setup_sac_learn, delete_file_path_zip
+from rollout_backprop_definitions import get_information, get_current_episode, setup_sac_learn, delete_file_path_zip
 
 
 #Creating the RL Environment
@@ -27,27 +27,28 @@ env = FrameStack(env, 13)
 
 #Datetime for the creation of a folder
 
-dt, example_folder = get_datetime(current_datetime = True, example_datetime = "12_05_19_54")
+dt, additional_episodes, train_frequency, async_bool, timeout = get_information()
 
 #Find the largest file in the folder
-current_episode = get_current_episode(directory = "deta/", example_folder = example_folder, start_from_scratch = True)
+current_episode = get_current_episode()
 
 #TODO implement normal total episodes
-additional_episodes = 10
+
 total_episodes = current_episode+additional_episodes
-train_frequency = 1500
 total_timesteps = total_episodes*train_frequency
 
 #TODO Implement normal time break
-timeout = time.time() + 10*60   # 10 minutes from now
+timerestriction = time.time() + timeout
+
 print(current_episode)
 print(dt)
+
 while current_episode < total_episodes:
-    data_file = "deta/"+dt+"/{}.pkl".format(current_episode)
+    data_file = "runs/"+dt+"/data/{}.pkl".format(current_episode)
 
     if os.path.isfile(data_file):
 
-        policy2_file = "waights/"+dt+"/{}".format(current_episode+1)
+        policy2_file = "runs/"+dt+"/weights/{}".format(current_episode+1)
 
         #set up the SAC model
 
@@ -59,9 +60,9 @@ while current_episode < total_episodes:
 
         model.save(policy2_file)
 
-        deleted_file = delete_file_path_zip(directory = "waights/", dt = dt, current_episode = current_episode, recent_left = 1, history = 10)
+        deleted_file = delete_file_path_zip(dt = dt, current_episode = current_episode, recent_left = 1, history = 10)
 
         current_episode += 1
 
-    if time.time() > timeout:
+    if time.time() > timerestriction:
         break
