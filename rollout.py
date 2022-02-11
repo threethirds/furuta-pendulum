@@ -12,9 +12,6 @@ from pendulum.jetson import JetsonPendulum
 from real import FurutaPendulumEnv
 from pendulum.mock import MockPendulum
 
-#Datetime for the creation of a folder
-
-start_time  = time.time()
 
 #get_datetime gives us the name of the folder which is going to be used
 
@@ -22,8 +19,8 @@ dt, additional_episodes, train_frequency, async_bool, timeout = get_information(
 
 
 #Creating the RL Environment
-#pendulum = JetsonPendulum(torque_coefficient=0.4)
-pendulum = MockPendulum()
+pendulum = JetsonPendulum(torque_coefficient=0.5)
+#pendulum = MockPendulum()
 env = FurutaPendulumEnv(pendulum, steps=1, timestep=120)
 env = FrameStack(env, 13)
 
@@ -32,30 +29,33 @@ current_episode = get_current_episode()
 total_episodes = current_episode + additional_episodes
 total_timesteps = total_episodes*train_frequency
 
-#timepoint
-time_2  = time.time()
-print(time_2-start_time)
 
-if current_episode==0:
+if current_episode==1:
     #set up the SAC model
     model = SAC('MlpPolicy', env, verbose=0, gamma = 0.99, gradient_steps = 100, train_freq = 1500, buffer_size=100000, optimize_memory_usage=True)
 
     total_timesteps, callback = model._setup_learn(total_timesteps = total_timesteps, eval_env = env, log_path = "log")
-    policy_file = "runs/"+dt+"/weights/0"
+    if async_bool == 1:
+        policy_file = "runs/"+dt+"/weights/0"
+        model.save(policy_file)
+    policy_file = "runs/"+dt+"/weights/1"
     model.save(policy_file)
 else:
     policy_file = "runs/"+dt+"/weights/{}".format(current_episode)
     model = SAC.load(policy_file)
     model.set_env(env)
     total_timesteps, callback = model._setup_learn(total_timesteps = total_timesteps, eval_env = env, log_path = "log")
+    if async_bool == 1:
+        policy_file = "runs/"+dt+"/weights/{}".format(current_episode-1)
+        model.save(policy_file)
 
 log_interval = 4
 
 timeconstraint = time.time() + timeout   
 
 #timepoint
-time_3  = time.time()
-print(time_3-time_2)
+time_1  = time.time()
+
 
 #async duplicates the first rollout (since we have two rollouts with weight0)
 
@@ -77,11 +77,9 @@ while current_episode < total_episodes:
 
         time.sleep(0.2)
 
-        model, callback = setup_sac_learn(environment = env, current_episode=current_episode, dt=dt, total_timesteps = total_timesteps, async_bool=async_bool)
+        model, callback = setup_sac_learn(environment = env, current_episode=current_episode-async_bool, dt=dt, total_timesteps = total_timesteps, async_bool=async_bool)
 
         #timepoint
-        time_4  = time.time()
-        print(time_4-time_3)
 
         rollout = model.collect_rollouts(
                         model.env,
@@ -94,24 +92,23 @@ while current_episode < total_episodes:
                     )
         
         #timepoint
-        time_5  = time.time()
-        print(time_5-time_4)
+        time_2  = time.time()
+        print(time_2-time_1)
+        time_1 = time_2
 
         data_file = "runs/"+dt+"/data/{}".format(current_episode)
 
         model.save_replay_buffer(data_file)
 
-        deleted_file = delete_file_path_pkl(dt = dt, current_episode = current_episode, recent_left = 2, history = 10)
+        deleted_file = delete_file_path_pkl(dt = dt, current_episode = current_episode, recent_left = 3, history = 66)
 
         #timepoint
-        time_3  = time.time()
-        print(time_3-time_5)
 
         current_episode += 1
 
         if duplicate_first_rollout == 1: 
             current_episode -=1
-            duplicate_first_rollout == 0
+            duplicate_first_rollout = 0
 
 
     if time.time() > timeconstraint:

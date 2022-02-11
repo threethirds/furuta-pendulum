@@ -40,7 +40,7 @@ def get_current_episode():
     f.close()
     
     if current_datetime:
-        current_episode = 0
+        current_episode = 1
     else:
         if os.path.isdir("runs/"+example_datetime):
             list_of_files = listdir("runs/"+example_datetime+"/weights")
@@ -53,11 +53,11 @@ def get_current_episode():
             current_episode = file_number
             print(current_episode)
         else:
-            current_episode = 0
+            current_episode = 1
     return current_episode
 
 def setup_sac_learn(environment, current_episode, dt, total_timesteps, async_bool):
-    policy_file = "runs/"+dt+"/weights/{}.zip".format(current_episode-async_bool)
+    policy_file = "runs/"+dt+"/weights/{}.zip".format(current_episode)
 
     model = SAC.load(policy_file)
     model.set_env(environment)

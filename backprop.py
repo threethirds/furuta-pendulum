@@ -40,9 +40,6 @@ total_timesteps = total_episodes*train_frequency
 #TODO Implement normal time break
 timerestriction = time.time() + timeout
 
-print(current_episode)
-print(dt)
-
 while current_episode < total_episodes:
     data_file = "runs/"+dt+"/data/{}.pkl".format(current_episode)
 
@@ -52,7 +49,7 @@ while current_episode < total_episodes:
 
         #set up the SAC model
 
-        model, callback = setup_sac_learn(environment = env, current_episode=current_episode, dt=dt, total_timesteps= total_timesteps)
+        model, callback = setup_sac_learn(environment = env, current_episode=current_episode, dt=dt, total_timesteps= total_timesteps, async_bool=async_bool)
 
         model.load_replay_buffer(data_file)
 
@@ -60,7 +57,7 @@ while current_episode < total_episodes:
 
         model.save(policy2_file)
 
-        deleted_file = delete_file_path_zip(dt = dt, current_episode = current_episode, recent_left = 1, history = 10)
+        deleted_file = delete_file_path_zip(dt = dt, current_episode = current_episode, recent_left = 2, history = 10)
 
         current_episode += 1
 

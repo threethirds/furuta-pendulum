@@ -101,7 +101,7 @@ class FurutaPendulumEnv(gym.Env):
 
         # reset the simulation and create from scratch
         self.pendulum.set_rotation(0)
-        time.sleep(1)
+        time.sleep(3)
         self.pendulum.calibrate()
 
         # Step counter
