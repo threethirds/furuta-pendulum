@@ -19,7 +19,7 @@ dt, additional_episodes, train_frequency, async_bool, timeout = get_information(
 
 
 #Creating the RL Environment
-pendulum = JetsonPendulum(torque_coefficient=0.5)
+pendulum = JetsonPendulum(torque_coefficient=0.6)
 #pendulum = MockPendulum()
 env = FurutaPendulumEnv(pendulum, steps=1, timestep=120)
 env = FrameStack(env, 13)
@@ -32,7 +32,7 @@ total_timesteps = total_episodes*train_frequency
 
 if current_episode==1:
     #set up the SAC model
-    model = SAC('MlpPolicy', env, verbose=0, gamma = 0.99, gradient_steps = 100, train_freq = 1500, buffer_size=100000, optimize_memory_usage=True)
+    model = SAC('MlpPolicy', env, verbose=0, gamma = 0.99, gradient_steps = 500, train_freq = 1000, buffer_size=500000, optimize_memory_usage=True)
 
     total_timesteps, callback = model._setup_learn(total_timesteps = total_timesteps, eval_env = env, log_path = "log")
     if async_bool == 1:
@@ -100,7 +100,7 @@ while current_episode < total_episodes:
 
         model.save_replay_buffer(data_file)
 
-        deleted_file = delete_file_path_pkl(dt = dt, current_episode = current_episode, recent_left = 3, history = 66)
+        deleted_file = delete_file_path_pkl(dt = dt, current_episode = current_episode, recent_left = 3, history = 666)
 
         #timepoint
 

@@ -53,7 +53,7 @@ while current_episode < total_episodes:
 
         model.load_replay_buffer(data_file)
 
-        model.train(gradient_steps = 100)
+        model.train(gradient_steps = 500)
 
         model.save(policy2_file)
 

@@ -4,12 +4,12 @@ from stable_baselines3 import SAC
 from pendulum.jetson import JetsonPendulum
 from real import FurutaPendulumEnv
 
-file_name = "Policies/10001furutapendulum1k1h"
+file_name = "Policies/00001furutapendulum"
 
 test_steps = 2000
 
 
-pendulum = JetsonPendulum(torque_coefficient=1)
+pendulum = JetsonPendulum(torque_coefficient=0.7)
 env = FurutaPendulumEnv(pendulum, steps=1000, timestep=120)
 env = FrameStack(env, 13)
 
