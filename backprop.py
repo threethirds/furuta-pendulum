@@ -1,12 +1,11 @@
 import torch
 
 from ci.basic_off_policy import BasicOffPolicyCI
-from pendulum.env import FurutaPendulumEnv
-from pendulum.mock import MockPendulum
 
 run_id = '2021-02-11-run-1'
-env = FurutaPendulumEnv(MockPendulum(), steps=1, timestep=120)
 ci = BasicOffPolicyCI('./runs', run_id)
+batch_size = 256
+gradient_steps = 500
 
 for t in ci.iter_backprop():
 
@@ -15,15 +14,20 @@ for t in ci.iter_backprop():
         policy = model.policy
         model.save(ci.checkpoint_path(0))
         torch.jit.save(policy, ci.policy_path(0))
-        continue
 
-    buffer = npz_buffer(range(t))
-    model = load(ci.checkpoint_path(t - 1))
+    else:
 
-    # backprop
-    new_model = backprop(buffer, model)
-    new_policy = new_model.policy
+        # Load data and model checkpoint
+        buffer = npz_buffer([ci.data_path(i) for i in range(t)])  # frame stack?
+        model = load(ci.checkpoint_path(t - 1))
 
-    # store
-    new_model.save(ci.checkpoint_path(t))
-    torch.jit.save(new_policy, ci.policy_path(t))
+        for _ in range(gradient_steps):
+
+            # sample and backprop
+            batch = buffer.sample(batch_size=batch_size)
+            new_model = backprop(batch, model)
+
+        # store
+        new_policy = new_model.policy
+        new_model.save(ci.checkpoint_path(t))
+        torch.jit.save(new_policy, ci.policy_path(t))

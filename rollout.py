@@ -1,3 +1,4 @@
+import atexit
 from collections import defaultdict
 import time
 
@@ -12,6 +13,7 @@ from pendulum.env import FurutaPendulumEnv
 run_id = '2021-02-11-run-1'
 env = FurutaPendulumEnv(MockPendulum(), steps=1, timestep=120)
 ci = BasicOffPolicyCI('./runs', run_id)
+atexit.register(lambda: env.pendulum.set_rotation(0))
 
 for t in ci.iter_rollout():
     print(t)
@@ -24,7 +26,7 @@ for t in ci.iter_rollout():
     # Subsequent rollouts - stored policy
     else:
         rollout_steps = 1500
-        π = torch.jit.load(ci.policy_path(t-1))
+        π = torch.jit.load(ci.policy_path(t - 1))
         π.reset()
         π.eval()
 
@@ -59,4 +61,5 @@ for t in ci.iter_rollout():
         np.savez_compressed(df, **{k: np.array(v) for k, v in rollout.items()})
 
     # Pause for the pendulum to calm down
+    env.pendulum.set_rotation(0)  # TODO
     time.sleep(3)
