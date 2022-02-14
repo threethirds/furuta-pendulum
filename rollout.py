@@ -24,7 +24,7 @@ for t in ci.iter_rollout():
     # Subsequent rollouts - stored policy
     else:
         rollout_steps = 1500
-        π = torch.jit.load(ci.policy_path(t))
+        π = torch.jit.load(ci.policy_path(t-1))
         π.reset()
         π.eval()
 
