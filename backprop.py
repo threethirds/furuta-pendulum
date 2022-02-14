@@ -1,65 +1,29 @@
-import gym
-import os
-from os import listdir
+import torch
 
-import time
-from datetime import datetime
-
-import numpy as np
-import torch as th
-
-from torch.nn import functional as F
-from gym.wrappers import FrameStack
-
-from stable_baselines3.common.utils import polyak_update
-from stable_baselines3 import SAC
-
-from rollout_backprop_definitions import get_information, get_current_episode, setup_sac_learn, delete_file_path_zip
-
-
-#Creating the RL Environment
+from ci.basic_off_policy import BasicOffPolicyCI
+from pendulum.env import FurutaPendulumEnv
 from pendulum.mock import MockPendulum
-from real import FurutaPendulumEnv
 
-pendulum = MockPendulum()
-env = FurutaPendulumEnv(pendulum, steps=1, timestep=120)
-env = FrameStack(env, 13)
+run_id = '2021-02-11-run-1'
+env = FurutaPendulumEnv(MockPendulum(), steps=1, timestep=120)
+ci = BasicOffPolicyCI('./runs', run_id)
 
-#Datetime for the creation of a folder
+for t in ci.iter_backprop():
 
-dt, additional_episodes, train_frequency, async_bool, timeout = get_information()
+    if t == 0:
+        model = model_class.init()
+        policy = model.policy
+        model.save(ci.checkpoint_path(0))
+        torch.jit.save(policy, ci.policy_path(0))
+        continue
 
-#Find the largest file in the folder
-current_episode = get_current_episode()
+    buffer = npz_buffer(range(t))
+    model = load(ci.checkpoint_path(t - 1))
 
-#TODO implement normal total episodes
+    # backprop
+    new_model = backprop(buffer, model)
+    new_policy = new_model.policy
 
-total_episodes = current_episode+additional_episodes
-total_timesteps = total_episodes*train_frequency
-
-#TODO Implement normal time break
-timerestriction = time.time() + timeout
-
-while current_episode < total_episodes:
-    data_file = "runs/"+dt+"/data/{}.pkl".format(current_episode)
-
-    if os.path.isfile(data_file):
-
-        policy2_file = "runs/"+dt+"/weights/{}".format(current_episode+1)
-
-        #set up the SAC model
-
-        model, callback = setup_sac_learn(environment = env, current_episode=current_episode, dt=dt, total_timesteps= total_timesteps, async_bool=async_bool)
-
-        model.load_replay_buffer(data_file)
-
-        model.train(gradient_steps = 100)
-
-        model.save(policy2_file)
-
-        deleted_file = delete_file_path_zip(dt = dt, current_episode = current_episode, recent_left = 2, history = 10)
-
-        current_episode += 1
-
-    if time.time() > timerestriction:
-        break
+    # store
+    new_model.save(ci.checkpoint_path(t))
+    torch.jit.save(new_policy, ci.policy_path(t))
