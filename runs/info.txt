@@ -1,12 +1,12 @@
 Use new data:
 0
 Old data folder:
-02_08_13_25
+02_13_00_00
 Async:
 1
 Additional episodes:
-300
+500
 Train frequency:
-1500
+1000
 Timeout:
-3600
+14400

@@ -66,6 +66,7 @@ class JetsonPendulum(Pendulum):
 
         # assume pointing down
         x = self.adc.voltage
+        print(x)
 
         if x < 0. or x > 0.78:
             raise EnvironmentError("change potentiometer hand location")
